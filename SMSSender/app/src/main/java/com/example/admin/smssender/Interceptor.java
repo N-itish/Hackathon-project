@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.telephony.PhoneStateListener;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -15,80 +14,77 @@ import android.util.Log;
  */
 
 public class Interceptor extends BroadcastReceiver {
-
+    public enum MailTypes{
+        SMS,
+        CALL
+    }
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        //Getting the users mail
         SharedPreferences prefs = context.getSharedPreferences("pref_1",Context.MODE_PRIVATE);
-        final String email = prefs.getString("usermail",null);
+        final String email = prefs.getString("email",null);
+
         System.out.println(email);
         Log.v("SUCCESS","Detected by receiver!!!");
+
+        //checking if the phone is ringing
         if(intent.getAction().equals("android.intent.action.PHONE_STATE")){
 
 
-                    String State = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+            String State = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
             final String incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
             if(State.equals(TelephonyManager.EXTRA_STATE_RINGING)){
-                System.out.println(incomingNumber);
                 //Sends the message to the user
-                try {
                     Log.v("SUCCESS","reached InterceptCall");
-                    Thread mailThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println("Running the thread!!!");
-                            MailUtil mailUtil = new MailUtil(email);
-                            if(incomingNumber != null) {
-                                mailUtil.Start_Mail_for_call(incomingNumber);
-                            }
-                        }
-                    });
-                    //Starting the mail thread
-                    System.out.println("Thread starting now !!!");
-                    mailThread.start();
+                    if(incomingNumber != null) {
+                        startMailThread(email,incomingNumber,MailTypes.CALL);
+                    }
+                    else
+                    {
+                        startMailThread(email,"unable to get phone no!!!",MailTypes.CALL);
+                    }
 
-
-                }catch (Exception e)
-                {
-                    System.err.println("Message: " + e.getMessage());
-                    System.err.println("Caused by:" + e.getCause());
-                    System.out.println("failed to send mail!!!");
-                    e.printStackTrace();
-                }
             }
         }
+        // checking if the sms is recieved
         if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
             Log.v("SUCCESS","Entered inside intent for sms");
             Bundle bundle = intent.getExtras();
             SmsMessage[] msgs = null;
             String msg_from;
             if(bundle !=null){
-                try{
                     Object[] pdus = (Object[]) bundle.get("pdus");
                     msgs = new SmsMessage[pdus.length];
                     for(int i=0; i< msgs.length; i++) {
-                        msgs[i]=SmsMessage.createFromPdu((byte[])pdus[i]);
+                        msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
                         msg_from = msgs[i].getOriginatingAddress();
                         String msgBody = msgs[i].getMessageBody();
-                        final String message= "\nFrom :  " + msg_from + "\n--------\nMessage Content: \n" + msgBody;
+                        final String message = "\nFrom :  " + msg_from + "\n--------\nMessage Content: \n" + msgBody;
                         Log.v("SUCCESS", message);
-
-                        Thread mailThread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                System.out.println("Running the SMS Notifying mail thread!!!");
-                                MailUtil mailUtil = new MailUtil(email);
-                                mailUtil.Start_Mail_for_msg(message);
-                            }
-                        });
-                        //Starting the mail thread
-                        System.out.println("Thread starting now !!!");
-                        mailThread.start();
-
+                        startMailThread(email,message,MailTypes.SMS);
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
             }
         }
+    }
+
+    public void startMailThread(final String email, final String message, final MailTypes types){
+        Thread mailThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Running the SMS Notifying mail thread!!!");
+                MailUtil mailUtil = new MailUtil(email);
+                switch (types){
+                    case SMS:
+                        mailUtil.Start_Mail_for_msg(message);
+                    case CALL:
+                        mailUtil.Start_Mail_for_call(message);
+                }
+
+            }
+        });
+        //Starting the mail thread
+        System.out.println("Thread starting now !!!");
+        mailThread.start();
     }
 }

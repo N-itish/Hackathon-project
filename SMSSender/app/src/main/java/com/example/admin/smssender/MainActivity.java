@@ -76,11 +76,13 @@ public class MainActivity extends AppCompatActivity {
         else
         {
             final EditText email = (EditText)findViewById(R.id.email);
+            final EditText username = (EditText)findViewById(R.id.name);
             Button setEmail = (Button)findViewById(R.id.setMail);
             setEmail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new storeUserMail().execute(email.getText().toString());
+                    storeUserDetails userDetails = new storeUserDetails(email.getText().toString(),username.getText().toString());
+                    userDetails.start();
                     Intent intent = new Intent(MainActivity.this,Homepage.class);
                     startActivity(intent);
                 }
@@ -106,24 +108,29 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private class storeUserMail extends AsyncTask<String,Void,Void>{
+
+    public class storeUserDetails extends Thread{
         SharedPreferences pref;
-        @Override
-        protected void onPreExecute(){
-             pref = getSharedPreferences("pref_1",MODE_PRIVATE);
+        private String email;
+        private String username;
+
+        public storeUserDetails(String email,String username){
+            this.email = email;
+            this.username = username;
+            pref =  getSharedPreferences("pref_1",MODE_PRIVATE);
         }
 
-        @Override
-        protected Void doInBackground(String... params) {
-            String userEmail = params[0];
+        public void run(){
             SharedPreferences.Editor editor = pref.edit();
-            editor.putString("usermail",userEmail);
+            editor.putString("username",username);
+            editor.putString("email",email);
             editor.apply();
             editor.commit();
-            Log.v("pref","Stored key");
-            return null;
+            Log.v("SharedPref","Shared data is set");
         }
+
     }
+
 }
 
 

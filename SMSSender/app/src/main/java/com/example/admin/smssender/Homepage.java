@@ -15,7 +15,7 @@ public class Homepage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
         final SharedPreferences pref = getSharedPreferences("pref_1",MODE_PRIVATE);
-        String message = pref.getString("usermail",null);
+        String message = pref.getString("username",null);
         TextView view = (TextView)findViewById(R.id.textView);
         view.setText("Hello "+message);
 
@@ -23,9 +23,11 @@ public class Homepage extends AppCompatActivity {
         newmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // removing the shared prefrences
+                pref.edit().clear().apply();
                 Intent intent = new Intent(Homepage.this,MainActivity.class);
                 startActivity(intent);
-                pref.edit().remove("usermail").commit();
+
 
             }
         });
