@@ -26,13 +26,6 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".Interceptor">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
-
         <activity android:name=".Homepage"></activity>
     </application>
 

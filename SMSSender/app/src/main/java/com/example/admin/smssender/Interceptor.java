@@ -72,15 +72,14 @@ public class Interceptor extends BroadcastReceiver {
         Thread mailThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Running the SMS Notifying mail thread!!!");
+                System.out.println("Running the mail thread!!!");
                 MailUtil mailUtil = new MailUtil(email);
                 switch (types){
                     case SMS:
-                        mailUtil.Start_Mail_for_msg(message);
+                        mailUtil.sendMail(message,"SMS");
                     case CALL:
-                        mailUtil.Start_Mail_for_call(message);
+                        mailUtil.sendMail(message,"CALL");
                 }
-
             }
         });
         //Starting the mail thread
