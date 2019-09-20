@@ -38,7 +38,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="214dp"
+        android:layout_marginBottom="190dp"
         android:background="@drawable/signin_rect"
         android:gravity="center_horizontal"
         android:paddingBottom="12dp"
@@ -53,7 +53,13 @@
 
     <Button
         android:id="@+id/reciever"
-        android:layout_width="match_parent"
+        android:layout_width="147dp"
         android:layout_height="wrap_content"
-        android:text="Start" />
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/signin_rect"
+        android:text="On/Off"
+        android:textColor="#ffffff"
+        tools:layout_editor_absoluteX="51dp"
+        tools:layout_editor_absoluteY="245dp" />
 </LinearLayout>

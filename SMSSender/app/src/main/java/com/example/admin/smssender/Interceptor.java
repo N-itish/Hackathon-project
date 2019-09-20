@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import java.util.Date;
 
 /**
  * Created by admin on 8/24/2019.
@@ -52,6 +53,7 @@ public class Interceptor extends BroadcastReceiver {
             Log.v("SUCCESS","Entered inside intent for sms");
             Bundle bundle = intent.getExtras();
             SmsMessage[] msgs = null;
+            String message = null;
             String msg_from;
             if(bundle !=null){
                     Object[] pdus = (Object[]) bundle.get("pdus");
@@ -60,10 +62,10 @@ public class Interceptor extends BroadcastReceiver {
                         msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
                         msg_from = msgs[i].getOriginatingAddress();
                         String msgBody = msgs[i].getMessageBody();
-                        final String message = "\nFrom :  " + msg_from + "\n--------\nMessage Content: \n" + msgBody;
+                        message = "\nFrom :  " + msg_from + "\n--------\nMessage Content: \n" + msgBody;
                         Log.v("SUCCESS", message);
-                        startMailThread(email,message,MailTypes.SMS);
                     }
+                startMailThread(email,message,MailTypes.SMS);
             }
         }
     }
@@ -74,11 +76,19 @@ public class Interceptor extends BroadcastReceiver {
             public void run() {
                 System.out.println("Running the mail thread!!!");
                 MailUtil mailUtil = new MailUtil(email);
+                Date date = new Date();
+                String subject  = "";
+                String msg = "";
                 switch (types){
                     case SMS:
-                        mailUtil.sendMail(message,"SMS");
+                        subject = "You just got a new message on your phone at "+ date;
+                        msg+= "\n------------------------------";
+                        msg+= "\n" + message;
+                        mailUtil.sendMail(subject,msg);
                     case CALL:
-                        mailUtil.sendMail(message,"CALL");
+                        subject = "You just got a call on your phone at "+date;
+                        msg = "\nFrom: " + message;
+                        mailUtil.sendMail(subject,msg);
                 }
             }
         });

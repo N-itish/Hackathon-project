@@ -1,26 +1,20 @@
 package com.example.admin.smssender;
 
 import android.Manifest;
-import android.content.Context;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -81,10 +75,16 @@ public class MainActivity extends AppCompatActivity {
             setEmail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    storeUserDetails userDetails = new storeUserDetails(email.getText().toString(),username.getText().toString());
-                    userDetails.start();
-                    Intent intent = new Intent(MainActivity.this,Homepage.class);
-                    startActivity(intent);
+                    if (email.getText().toString().replace(" ","").equalsIgnoreCase("") || username.getText().toString().replace(" ","").equalsIgnoreCase(""))
+                    {
+                        Toast.makeText(MainActivity.this,"Either email or username is empty",Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        storeUserDetails userDetails = new storeUserDetails(email.getText().toString(), username.getText().toString());
+                        userDetails.start();
+                        Intent intent = new Intent(MainActivity.this, Homepage.class);
+                        startActivity(intent);
+                    }
                 }
             });
         }

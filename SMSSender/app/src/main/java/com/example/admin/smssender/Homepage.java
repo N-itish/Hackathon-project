@@ -13,6 +13,7 @@ import android.widget.Toast;
 public class Homepage extends AppCompatActivity {
 
     Interceptor intercept = new Interceptor();
+    boolean setlistnerOn = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,15 +29,24 @@ public class Homepage extends AppCompatActivity {
         startReciever.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    IntentFilter filter = new IntentFilter();
-                    filter.addAction("android.intent.action.PHONE_STATE");
-                    filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-                    registerReceiver(intercept, filter);
-                    Toast.makeText(Homepage.this,"Listners started!!!",Toast.LENGTH_LONG).show();
-                }catch (Exception e)
-                {
-                    System.out.println(e.getMessage());
+
+                if (setlistnerOn){
+                    try {
+                        IntentFilter filter = new IntentFilter();
+                        filter.addAction("android.intent.action.PHONE_STATE");
+                        filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+                        registerReceiver(intercept, filter);
+                        Toast.makeText(Homepage.this,"Listners started!!!",Toast.LENGTH_SHORT).show();
+                    }catch (Exception e)
+                    {
+                        System.out.println(e.getMessage());
+                    }
+                    setlistnerOn = false;
+                }
+                else {
+                    unregisterReceiver(intercept);
+                    Toast.makeText(Homepage.this,"Listners closed!!!",Toast.LENGTH_SHORT).show();
+                    setlistnerOn = true;
                 }
 
             }
